@@ -1,32 +1,32 @@
-# VkBot
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import vk
-import time
-from flask import Flask, request, json
+from time import sleep
+import json
+import requests
 
-app = Flask(__name__)
-
-@app.route('/', methods=['POST'])
-
-def proccesing():
- session = vk.AuthSession(app_id='******',
-                         user_login='********',
-                         user_password='**********',
+session = vk.AuthSession(app_id='xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+                         user_login='xxxxxxxxxxxxxxxxxxxxxxx',
+                         user_password='xxxxxxxxxxx',
                          scope='offline, messages, wall, friends, photos, status')
 
- vk_api = vk.API(session)
+vk_api = vk.API(session)
 
- def send_message(user_id, message):
-    vk_api.messages.send(user_id = str(id), message='smorc smorc')
+def checkMessages(message_list):
+    for message in message_list:
+        if type(message) is int:
+            continue
+        if message['read_state'] == 0:
+            if 'chat_id' not in message:
+                ids = int(message['uid'])
+                vk_api.messages.send(user_id = ids, message  = "smrc smorc")
 
- def get_message(massage,data):
-    id = data['object']['user_id']
-    vk_api.send_message(id)
 
- while True:
-  data = json.loads(request.data)
-  if data['type'] == 'message_new':
-   get_message(data['object'])
- sleep(10)
+while True:
+    message = vk_api.messages.get(time_offset = 0)
+    if len(message) != 1 and message[1]['read_state'] == 0:
+        checkMessages(message)
+    else:
+        print('No new messages!')
+    sleep(6)
