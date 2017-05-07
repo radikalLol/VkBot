@@ -9,14 +9,15 @@ from lxml import html
 from bs4 import BeautifulSoup
 import random
 
-session = vk.AuthSession(app_id='ччччччччччччччччччч',
-                         user_login='ччччччччччччччччччч',
-                         user_password='ччччччччччччччччччч',
+session = vk.AuthSession(app_id='cccccccccccccccccccccc',
+                         user_login='ccccccccccccccccccccccc',
+                         user_password='cccccccccccccccccccccc',
                          scope='offline, messages, wall, friends, photos, status')
 
 vk_api = vk.API(session)
 
 def checkMessages( message_list, photo_list,posts_list):
+    IDS = []
     for message in message_list:
         if type(message) is int:
             continue
@@ -32,6 +33,12 @@ def checkMessages( message_list, photo_list,posts_list):
             if words.encode('utf-8') in ['Не груби', 'Хватит', 'Не бунтуй', 'Сейчас получишь']:
                 msg = random.choice(['БУНТ!', 'Ладно:(', 'Буду', 'Smorc Smorc'])
                 vk_api.messages.send(user_id=ids, message=msg)
+
+            if words.encode('utf-8') in ['Hi','Привет','че как']:
+                user_list = vk_api.users.get(user_ids = ids)
+                UserName(user_list, message['uid'])
+                vk_api.messages.send(user_id=ids, message='^^')
+            return words.encode('utf-8')
             if words.encode('utf-8') in ['Статус', 'Статуй поменяй']:
                 for posts in posts_list:
                     if type(posts) is int:
@@ -47,7 +54,16 @@ def checkMessages( message_list, photo_list,posts_list):
                     pid = str(photo['pid'])
                     ph = 'photo' + str(-77127883) + '_' + str(pid)
                     vk_api.messages.send(user_id=ids, message = 'Лови! Smorc', attachment=ph)
+            else:
+                msg = random.choice(['Сложно', 'Не ясно', 'Ясно', 'Lol', 'и?', 'БУНТ! smorc smorc'])
+                vk_api.messages.send(user_id=ids, message=msg)
 
+def UserName(user_list, ID):
+    for user in user_list:
+        if user['uid'] == ID:
+            uname = user['first_name']
+            ms = random.choice(['Hey hey', 'Привет' , 'че как'])
+            vk_api.messages.send(user_id=ID, message=ms + ', ' + uname.encode('utf-8'))
 while True:
     f = open('t.txt', 'w')
     message = vk_api.messages.get(time_offset = 0)
@@ -63,3 +79,4 @@ while True:
     else:
         print('No new messages!')
     sleep(6)
+    
